@@ -30,6 +30,23 @@ Finding #1:
 "“The Wikias also count up the number of appearances of each character in the comic books they have in their databases. I was able to pull appearance counts for 6,541 of the DC characters and 15,280 Marvel characters.10 Since I’m also interested in how female representation has changed over time, I pulled the month and year of the first issue each character appeared in.11 I got first-appearance data for 6,827 DC characters and 15,561 Marvel characters."
 
 ```{r}
+marvel_appearances <- marvel_data |> filter(!is.na(APPEARANCES)) |> nrow()
+dc_appearances <- dc_data |> filter(!is.na(APPEARANCES)) |> nrow()
+ 
+# Count number of characters with first appearance data
+marvel_first_appear <- marvel_data |> filter(!is.na(`FIRST APPEARANCE`)) |> nrow()
+dc_first_appear <- dc_data |> filter(!is.na(`FIRST APPEARANCE`)) |> nrow()
+
+
+marvel_data |> 
+  filter(SEX == "Female Characters") |>
+  group_by(Year) |>
+  summarize(count = n()) |>
+  ggplot(aes(x = Year, y = count)) +
+  geom_line() +
+  labs(title = "Number of Female Marvel Characters by Year",
+       x = "Year of First Appearance",
+       y = "Count")
 
 ```
 
@@ -38,7 +55,19 @@ Finding #2:
 "Women were substantially underrepresented among characters with at least one appearance. Among the characters for which we have gender data,12 females made up only 29.3 percent of the DC character list and 24.7 percent of the Marvel roster."
 
 ```{r}
+# Filter to characters with at least one appearance and known gender
+marvel_gender <- marvel_data |>
+  filter(!is.na(APPEARANCES), !is.na(SEX)) 
 
+dc_gender <- dc_data |>
+  filter(!is.na(APPEARANCES), !is.na(SEX)) 
+
+# Calculate percent female
+marvel_female_pct <- marvel_gender |>
+  summarize(percent_female = mean(SEX == "Female Characters") * 100)
+
+dc_female_pct <- dc_gender |>
+  summarize(percent_female = mean(SEX == "Female Characters") * 100)
 ```
 
 Finding #3:
@@ -46,6 +75,19 @@ Finding #3:
 "The same trend bears out when we look at characters with higher appearance counts. When we zero in on the 2,415 DC and 3,342 Marvel characters with gender data who appear at least 10 times — the set of characters that probably gives the most consistent view of what we see on the page — female characters make up only 30.9 percent of the DC universe and 30.6 percent of the Marvel universe."
 
 ```{r}
+# Filter to characters with at least 10 appearances and known gender
+marvel_10 <- marvel_data |>
+  filter(!is.na(APPEARANCES), !is.na(SEX), APPEARANCES >= 10)
+
+dc_10 <- dc_data |>
+  filter(!is.na(APPEARANCES), !is.na(SEX), APPEARANCES >= 10)
+
+# Calculate percent female among those
+marvel_female_pct_10 <- marvel_10 |>
+  summarize(percent_female = mean(SEX == "Female Characters") * 100)
+
+dc_female_pct_10 <- dc_10 |>
+  summarize(percent_female = mean(SEX == "Female Characters") * 100)
 
 ```
 
