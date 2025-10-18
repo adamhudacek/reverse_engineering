@@ -1,0 +1,68 @@
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Group: Adam, Sam, Will
+Story: Comic Books
+
+```{r}
+options(scipen=999)
+library(tidyverse)
+library(janitor)
+library(lubridate)
+
+```
+
+Load Story Data:
+
+```{r}
+#Load DC Comics Data
+dc_data <- read_csv("dc-wikia-data.csv")
+
+#Load Marvel Comics Data
+marvel_data <- read_csv("marvel-wikia-data.csv")
+
+```
+
+Finding #1:
+
+"“The Wikias also count up the number of appearances of each character in the comic books they have in their databases. I was able to pull appearance counts for 6,541 of the DC characters and 15,280 Marvel characters.10 Since I’m also interested in how female representation has changed over time, I pulled the month and year of the first issue each character appeared in.11 I got first-appearance data for 6,827 DC characters and 15,561 Marvel characters."
+
+```{r}
+
+```
+
+Finding #2:
+
+"Women were substantially underrepresented among characters with at least one appearance. Among the characters for which we have gender data,12 females made up only 29.3 percent of the DC character list and 24.7 percent of the Marvel roster."
+
+```{r}
+
+```
+
+Finding #3:
+
+"The same trend bears out when we look at characters with higher appearance counts. When we zero in on the 2,415 DC and 3,342 Marvel characters with gender data who appear at least 10 times — the set of characters that probably gives the most consistent view of what we see on the page — female characters make up only 30.9 percent of the DC universe and 30.6 percent of the Marvel universe."
+
+```{r}
+
+```
+
+Finding #4:
+
+"When we focus on only the most frequently appearing characters in each universe — the stars of the show — the data changes. Of characters with gender data and 100 or more appearances (294 DC characters and 414 Marvel characters), only 29.0 percent of DC’s are female, and a similar 31.1 percent of the Marvel crowd is."
+
+```{r}
+
+```
+
+Finding #5:
+
+"In both DC and Marvel, women were of neutral allegiance at a higher rate than men. Men were also more likely to be bad in each universe — in fact, bad-aligned men alone outnumbered all women combined. In other words, there’s something of a paucity of female villains.”
+
+```{r}
+
+```
+
+
