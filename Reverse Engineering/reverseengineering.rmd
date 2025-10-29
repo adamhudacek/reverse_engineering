@@ -4,7 +4,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 Group: Adam, Sam, Will
-Story: Comic Books
+
+## Introduction 
+
+In this notebook, we are reverse engineering the story, [STORY NAME](STORY URL)
+
+## Load libraries
+
+Loading required libraries for this analysis.
 
 ```{r}
 options(scipen=999)
@@ -14,7 +21,9 @@ library(lubridate)
 
 ```
 
-Load Story Data:
+## Load and Cleaning Data
+
+In this section, describe the source of the data, write a basic data dictionary for data you are working with, and discuss any caveats or issues you discovered working with this data. 
 
 ```{r}
 #Load DC Comics Data
@@ -25,9 +34,14 @@ marvel_data <- read_csv("marvel-wikia-data.csv")
 
 ```
 
+## Sentences to Engineer
+In this notebook, we are reverse engineering five sentences from the story.
+
 Finding #1:
 
-"“The Wikias also count up the number of appearances of each character in the comic books they have in their databases. I was able to pull appearance counts for 6,541 of the DC characters and 15,280 Marvel characters.10 Since I’m also interested in how female representation has changed over time, I pulled the month and year of the first issue each character appeared in.11 I got first-appearance data for 6,827 DC characters and 15,561 Marvel characters."
+"“The Wikias also count up the number of appearances of each character in the comic books they have in their databases. I was able to pull appearance counts for 6,541 of the DC characters and 15,280 Marvel characters. Since I’m also interested in how female representation has changed over time, I pulled the month and year of the first issue each character appeared in. I got first-appearance data for 6,827 DC characters and 15,561 Marvel characters."
+
+Analysis: After filtering the data to remove na values from both "APPEARANCES" and "FIRST APPEARANCE," we found that there were 6,827 first appearances of DC characters and 15,561 appearances of Marvel characters. These findings exactly replicate the findings of the original article. 
 
 ```{r}
 marvel_appearances <- marvel_data |> filter(!is.na(APPEARANCES)) |> nrow()
@@ -37,22 +51,18 @@ dc_appearances <- dc_data |> filter(!is.na(APPEARANCES)) |> nrow()
 marvel_first_appear <- marvel_data |> filter(!is.na(`FIRST APPEARANCE`)) |> nrow()
 dc_first_appear <- dc_data |> filter(!is.na(`FIRST APPEARANCE`)) |> nrow()
 
+#Display number of characters with first appearance data
+marvel_first_appear
 
-marvel_data |> 
-  filter(SEX == "Female Characters") |>
-  group_by(Year) |>
-  summarize(count = n()) |>
-  ggplot(aes(x = Year, y = count)) +
-  geom_line() +
-  labs(title = "Number of Female Marvel Characters by Year",
-       x = "Year of First Appearance",
-       y = "Count")
+dc_first_appear
 
 ```
 
 Finding #2:
 
-"Women were substantially underrepresented among characters with at least one appearance. Among the characters for which we have gender data,12 females made up only 29.3 percent of the DC character list and 24.7 percent of the Marvel roster."
+"Women were substantially underrepresented among characters with at least one appearance. Among the characters for which we have gender data, females made up only 29.3 percent of the DC character list and 24.7 percent of the Marvel roster."
+
+Analysis: After removing na values, we completed a simple calculation to find that the DC percentage was 24.749, and the Marvel percentage was 29.25159 After rounding, these findings exactly replicate the findings of the original article. 
 
 ```{r}
 # Filter to characters with at least one appearance and known gender
@@ -63,16 +73,20 @@ dc_gender <- dc_data |>
   filter(!is.na(APPEARANCES), !is.na(SEX)) 
 
 # Calculate percent female
-marvel_female_pct <- marvel_gender |>
-  summarize(percent_female = mean(SEX == "Female Characters") * 100)
+marvel_gender |>
+  summarize(marvel_percent_female = mean(SEX == "Female Characters") * 100) |>
+  arrange()
 
-dc_female_pct <- dc_gender |>
-  summarize(percent_female = mean(SEX == "Female Characters") * 100)
+dc_gender |>
+  summarize(dc_percent_female = mean(SEX == "Female Characters") * 100) |>
+  arrange()
 ```
 
 Finding #3:
 
 "The same trend bears out when we look at characters with higher appearance counts. When we zero in on the 2,415 DC and 3,342 Marvel characters with gender data who appear at least 10 times — the set of characters that probably gives the most consistent view of what we see on the page — female characters make up only 30.9 percent of the DC universe and 30.6 percent of the Marvel universe."
+
+Analysis: Similar to the last finding, we removed na values and created a new dataset for characters with more than or equal to 10 appearances, then replicated the same calculations to find that the DC percentage was 30.93043 and the Marvel percentage was 30.62843. After rounding, these findings exactly replicate the findings of the original article. 
 
 ```{r}
 # Filter to characters with at least 10 appearances and known gender
@@ -83,17 +97,21 @@ dc_10 <- dc_data |>
   filter(!is.na(APPEARANCES), !is.na(SEX), APPEARANCES >= 10)
 
 # Calculate percent female among those
-marvel_female_pct_10 <- marvel_10 |>
-  summarize(percent_female = mean(SEX == "Female Characters") * 100)
+marvel_10 |>
+  summarize(marvel_10_percent_female = mean(SEX == "Female Characters") * 100) |>
+  arrange()
 
-dc_female_pct_10 <- dc_10 |>
-  summarize(percent_female = mean(SEX == "Female Characters") * 100)
+dc_10 |>
+  summarize(dc_10_percent_female = mean(SEX == "Female Characters") * 100) |>
+  arrange()
 
 ```
 
 Finding #4:
 
 "When we focus on only the most frequently appearing characters in each universe — the stars of the show — the data changes. Of characters with gender data and 100 or more appearances (294 DC characters and 414 Marvel characters), only 29.0 percent of DC’s are female, and a similar 31.1 percent of the Marvel crowd is."
+
+Analysis:
 
 ```{r}
 
@@ -102,6 +120,8 @@ Finding #4:
 Finding #5:
 
 "In both DC and Marvel, women were of neutral allegiance at a higher rate than men. Men were also more likely to be bad in each universe — in fact, bad-aligned men alone outnumbered all women combined. In other words, there’s something of a paucity of female villains.”
+
+Analysis:
 
 ```{r}
 
