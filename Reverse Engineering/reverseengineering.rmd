@@ -7,7 +7,7 @@ Group: Adam, Sam, Will
 
 ## Introduction 
 
-In this notebook, we are reverse engineering the story, [STORY NAME](STORY URL)
+In this notebook, we are reverse engineering the story, "Comic Books are still Made by Men, for Men and About Men" (https://fivethirtyeight.com/features/women-in-comic-books/)
 
 ## Load libraries
 
@@ -39,7 +39,7 @@ In this notebook, we are reverse engineering five sentences from the story.
 
 Finding #1:
 
-"“The Wikias also count up the number of appearances of each character in the comic books they have in their databases. I was able to pull appearance counts for 6,541 of the DC characters and 15,280 Marvel characters. Since I’m also interested in how female representation has changed over time, I pulled the month and year of the first issue each character appeared in. I got first-appearance data for 6,827 DC characters and 15,561 Marvel characters."
+"The Wikias also count up the number of appearances of each character in the comic books they have in their databases. I was able to pull appearance counts for 6,541 of the DC characters and 15,280 Marvel characters. Since I’m also interested in how female representation has changed over time, I pulled the month and year of the first issue each character appeared in. I got first-appearance data for 6,827 DC characters and 15,561 Marvel characters."
 
 Analysis: After filtering the data to remove na values from both "APPEARANCES" and "FIRST APPEARANCE," we found that there were 6,827 first appearances of DC characters and 15,561 appearances of Marvel characters. These findings exactly replicate the findings of the original article. 
 
@@ -111,9 +111,24 @@ Finding #4:
 
 "When we focus on only the most frequently appearing characters in each universe — the stars of the show — the data changes. Of characters with gender data and 100 or more appearances (294 DC characters and 414 Marvel characters), only 29.0 percent of DC’s are female, and a similar 31.1 percent of the Marvel crowd is."
 
-Analysis:
+Analysis: This method is virtually the same as the previous one with appearances filtered to 100 versus just 10. The significance of the distinct groups is that this represents characters that were relatively successful and popular. Rounded to the tenth, the findings produced here match those of the article. 
 
 ```{r}
+# Filter to characters with at least 100 appearances and known gender
+marvel_100 <- marvel_data |>
+  filter(!is.na(APPEARANCES), !is.na(SEX), APPEARANCES >= 100)
+
+dc_100 <- dc_data |>
+  filter(!is.na(APPEARANCES), !is.na(SEX), APPEARANCES >= 100)
+
+# Calculate percent female among those
+marvel_100 |>
+  summarize(marvel_100_percent_female = mean(SEX == "Female Characters") * 100) |>
+  arrange()
+
+dc_100 |>
+  summarize(dc_100_percent_female = mean(SEX == "Female Characters") * 100) |>
+  arrange()
 
 ```
 
@@ -121,9 +136,34 @@ Finding #5:
 
 "In both DC and Marvel, women were of neutral allegiance at a higher rate than men. Men were also more likely to be bad in each universe — in fact, bad-aligned men alone outnumbered all women combined. In other words, there’s something of a paucity of female villains.”
 
-Analysis:
+Analysis: We're creating new datasets and filtering na values of our relevant fields, SEX and ALIGN. For each universe, we summarised counts for both of those fields, and then grouped by only SEX to create new fields that show us the proportion of each gender that is good bad or neutral. The findings above can all be observed in the results below.  
 
 ```{r}
+#Filter to rows with values for alignment and sex, get totals for each combination
+marvel_alignment <- marvel_data |>
+  filter(!is.na(ALIGN), !is.na(SEX)) |>
+  group_by(SEX, ALIGN) |>
+  summarise(count = n()) |>
+  group_by(SEX) |>
+  mutate(
+    total_gender = sum(count),
+    percent_gender = count / total_gender * 100
+  )
+
+dc_alignment <- dc_data |>
+  filter(!is.na(ALIGN), !is.na(SEX)) |>
+  group_by(SEX, ALIGN) |>
+  summarise(count = n()) |>
+  group_by(SEX) |>
+  mutate(
+    total_gender = sum(count),
+    percent_gender = count / total_gender * 100
+  )
+
+#Return tables
+marvel_alignment
+
+dc_alignment
 
 ```
 
